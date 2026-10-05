@@ -1,0 +1,92 @@
+# ONE recording. Paths are relative to this config file.
+paths:
+  input: Development_2953_5month.raw.h5
+  preprocessing: results/preprocessing_001
+  sorting: results/sorting_001
+  qc: results/qc_001
+  analysis: results/analysis_001
+  kilosort2: null  # USER MUST EDIT on GPU node; explicit KS2 checkout, not KS4
+reader:
+  all_annotations: true
+  # For multi-well files explicitly add stream_id / rec_name accepted by read_maxwell.
+
+# Stable settings. Only 300–6000 Hz is paper-confirmed (historical METHODS.md).
+preprocessing:
+  freq_min: 300
+  freq_max: 6000
+  dtype: float32
+  margin_ms: auto
+  filter_order: 5
+  ftype: butter
+  filter_mode: sos
+  direction: forward-backward
+  add_reflect_padding: false
+jobs:
+  n_jobs: 1
+  chunk_duration: 1s
+  progress_bar: false
+  max_threads_per_worker: 1
+seed: 42  # SI waveform/noise sampling; NOT a MATLAB/KS2 RNG seed
+
+# EXPERIMENT PARAMETERS: edit here; never modify src implementation.
+signal_qc:
+  windows: 5
+  window_sec: 0.5
+  plot_channels: 4
+  plot_duration_sec: 0.1
+  context_sec: 0.1
+  context_atol_uV: 0.05  # engineering tolerance, not paper value
+sorter:
+  overrides:
+    detect_threshold: 6  # explicit SI default; NOT paper-confirmed
+    projection_threshold: [10, 4]  # explicit SI default
+    keep_good_only: false
+    skip_kilosort_preprocessing: false
+    delete_tmp_files: false  # engineering override: preserve MATLAB files
+    delete_recording_dat: false
+  max_quantization_error_uV: 1.0  # engineering bound; revise only with amplitude evidence
+  runtime_confirmed: false  # set true only AFTER manual MATLAB/toolbox/gpuDevice/KS2 MEX validation
+  # Discovery alone cannot establish license/toolbox/CUDA MEX compatibility.
+analyzer:
+  ms_before: 1.0
+  ms_after: 2.0
+  max_spikes_per_unit: 300
+  sparsity_radius_um: 100.0
+  noise_chunks_per_segment: 10
+  noise_chunk_size: 10000
+metrics:
+  definitions_acknowledged: false  # accept SI formulas, not claim paper definition confirmed
+  isi_threshold_ms: 1.5
+  min_isi_ms: 0.0
+  snr_method: extremum
+  diagnostic_metrics: [presence_ratio, amplitude_median, amplitude_cv]
+curation:
+  snr_min: 5.0
+  isi_violation_max: 0.3
+  firing_rate_min_hz: 0.05
+visualization:
+  units_per_group: 3
+  borderline_relative_distance: 0.2
+  sampled_waveforms: 30
+  raster_duration_sec: 10.0
+  acg_window_ms: 50.0
+  acg_bin_ms: 1.0
+  max_acg_pairs: 2000000
+  amplitude_histogram_bins: 40
+  diagnostic_isi_max_ms: 100.0
+  diagnostic_isi_bins: 100
+  firing_rate_bin_sec: 1.0
+isi_analysis:
+  conventions_acknowledged: false
+  interval_start_sec: 0.0  # half-open [start, start + duration)
+  interval_sec: 180.0
+  short_recording_policy: skip  # skip or use_available; never pad
+  minimum_spikes: 30
+  isi_min_ms: 8.0
+  isi_max_ms: 100.0
+  median_scope: retained  # retained 8–100 ms, or all intervals in selected window
+  histogram_normalization: probability  # probability or density (per ms)
+  bin_width_method: median_divided_by_15
+  r2_min: 0.9
+  max_histogram_bins: 10000
+  refractory_ms: 1.5  # exploratory convention, NOT confirmed paper value
