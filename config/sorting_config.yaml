@@ -1,0 +1,80 @@
+# Paper values and engineering/software choices are distinguished in METHODS.md.
+seed: 42
+reader:
+  all_annotations: true
+preprocessing:
+  freq_min: 300
+  freq_max: 6000
+  dtype: float32
+  margin_ms: auto
+  filter_order: 5
+  ftype: butter
+  filter_mode: sos
+  direction: forward-backward
+  add_reflect_padding: false
+jobs:
+  n_jobs: 1
+  chunk_duration: 1s
+  progress_bar: false
+  max_threads_per_worker: 1
+signal_qc:
+  windows_per_segment: 5
+  window_sec: 0.5
+sorter:
+  name: kilosort2
+  path: null
+  overrides:
+    delete_tmp_files: false
+    delete_recording_dat: false
+    keep_good_only: false
+  # MATLAB template currently exposes no seed parameter. Do not invent one.
+metrics:
+  # Explicit software settings, NOT confirmed paper settings.
+  definitions_acknowledged: false
+  isi_threshold_ms: 1.5
+  min_isi_ms: 0.0
+  snr_method: extremum
+  diagnostic_metrics: [presence_ratio, amplitude_median, amplitude_cv]
+analyzer:
+  ms_before: 1.0
+  ms_after: 2.0
+  max_spikes_per_unit: 300
+  sparsity_radius_um: 100.0
+  noise_chunks_per_segment: 10
+  noise_chunk_size: 10000
+curation:
+  isi_violation_max: 0.3
+  firing_rate_min_hz: 0.05
+  snr_min: 5.0
+isi_analysis:
+  # Unspecified paper conventions must be explicitly acknowledged to run.
+  conventions_acknowledged: false
+  interval_start_sec: 0.0
+  interval_sec: 180.0
+  short_recording_policy: skip  # skip or use_available; never pad signal/spikes
+  minimum_spikes: 30
+  isi_min_ms: 8.0
+  isi_max_ms: 100.0
+  median_scope: retained  # retained or all; paper is ambiguous
+  histogram_normalization: probability  # probability or density
+  bin_width_method: median_divided_by_15
+  r2_min: 0.9
+  max_histogram_bins: 10000
+visualization:
+  units_per_group: 3
+  borderline_relative_distance: 0.2
+  sampled_waveforms: 30
+  raster_duration_sec: 10.0
+  acg_window_ms: 50.0
+  acg_bin_ms: 1.0
+  max_acg_pairs: 2000000
+  amplitude_histogram_bins: 40
+  diagnostic_isi_max_ms: 100.0
+  diagnostic_isi_bins: 100
+  firing_rate_bin_sec: 1.0
+concatenation:
+  confirmed: false
+  max_start_gap_sec: null
+  recordings: []
+  # Each entry: input_file, chip_id, configuration_id, recorded_at (ISO timezone).
+  # Matching configuration_id is an attestation; geometry/IDs/scaling are also checked.

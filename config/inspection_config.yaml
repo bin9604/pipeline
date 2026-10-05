@@ -1,0 +1,11 @@
+# Engineering inspection settings; these are not paper parameters.
+seed: 42
+windows_per_segment: 5
+window_sec: 0.5
+plot_channels: 8
+plot_duration_sec: 0.1
+scaling_rtol: 0.00001
+scaling_atol_uV: 0.01
+relative_outlier_factor: 10.0
+reader:
+  all_annotations: true
